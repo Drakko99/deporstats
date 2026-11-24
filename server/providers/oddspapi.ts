@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { Fixture, Quote } from '../../shared/types';
 import { TOTAL_LINES, TEAM_LINES, ASIAN_LINES, EUROPEAN_LINES } from '../../shared/market-catalog';
 import { read, write, type Environment } from '../store';
@@ -10,7 +11,8 @@ export interface ProviderMarket { marketId: number; marketName: string; sportId:
 /** Peticiones solo desde el servidor; caché persistente y una única repetición en rate limit. */
 export async function providerRequest<T>(env: Environment, endpoint: string, params: Record<string, string>, ttl: number): Promise<{ value: T; fetchedAt: string }> {
   if (!env.ODDSPAPI_API_KEY) throw new Error('Falta ODDSPAPI_API_KEY en el servidor. La demostración sigue disponible.');
-  const key = `cache/${endpoint}/${encodeURIComponent(JSON.stringify(params))}.json`;
+  const digest = createHash('sha256').update(JSON.stringify(params)).digest('hex');
+  const key = `cache/${endpoint}/${digest}.json`;
   const cached = await read<{ value: T; fetchedAt: string }>(env, key);
   if (cached && Date.now() - Date.parse(cached.fetchedAt) < ttl) return cached;
   const url = new URL(`https://api.oddspapi.io/v4/${endpoint}`);
