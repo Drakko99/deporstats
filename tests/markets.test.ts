@@ -1,0 +1,14 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { expectedValue, fairOdds, removeMargin, scoreDistribution } from '../server/markets';
+const near = (a: number, b: number, e = 1e-9) => assert.ok(Math.abs(a - b) < e, `${a} != ${b}`);
+test('La matriz conserva toda la masa y no contiene probabilidades negativas', () => { for (const h of [0.1, 1.2, 3, 12]) for (const a of [0.1, 1.8, 4, 12]) for (const rho of [-0.2, 0, 0.2]) { const p = scoreDistribution(h, a, rho); near(p.matrix.flat().reduce((s, x) => s + x, 0), 1); assert.ok(p.matrix.flat().every(x => x >= 0)); near(p.markets.slice(0, 3).reduce((s, m) => s + m.probability, 0), 1); } });
+test('Simetría entre equipos con tasas iguales', () => { const p = scoreDistribution(1.5, 1.5, -0.1); near(p.markets[0].probability, p.markets[2].probability); });
+test('Con independencia, under 2.5 coincide con Poisson de tasa total', () => { const p = scoreDistribution(1.3, 0.8, 0); near(p.markets.find(m => m.key === 'under:2.5')!.probability, Math.exp(-2.1) * (1 + 2.1 + 2.1 ** 2 / 2)); });
+test('Con independencia, ambos marcan coincide con el cálculo analítico', () => { const p = scoreDistribution(1.2, 1.8, 0); near(p.markets.find(m => m.key === 'btts:yes')!.probability, (1 - Math.exp(-1.2)) * (1 - Math.exp(-1.8))); });
+test('Totales enteros: ganar + perder + devolver = 1', () => { const p = scoreDistribution(1.4, 1.2, -0.08); const over = p.markets.find(m => m.key === 'over:2')!, under = p.markets.find(m => m.key === 'under:2')!; near(over.probability + under.probability + over.pushProbability, 1); near(over.pushProbability, under.pushProbability); });
+test('Cuota justa con devolución y valor esperado cero', () => { near(fairOdds(0.4, 0.3)!, 1.75); near(expectedValue(0.4, 1.75, 0.3), 0); });
+test('Cuota justa sin devolución', () => { near(fairOdds(0.25)!, 4); assert.equal(fairOdds(0), null); });
+test('Elimina el margen de una terna completa', () => { const p = removeMargin([2, 3, 4]); near(p.reduce((s, x) => s + x, 0), 1); near(p[0], 6 / 13); });
+test('Rechaza cuotas y probabilidades inválidas', () => { assert.throws(() => removeMargin([1, 3, 4])); assert.throws(() => fairOdds(0.8, 0.4)); assert.throws(() => expectedValue(0.5, Infinity)); assert.throws(() => scoreDistribution(NaN, 1, 0)); });
+test('Dixon–Coles modifica marcadores bajos y conserva marginales', () => { const base = scoreDistribution(1.4, 1, 0), dc = scoreDistribution(1.4, 1, -0.1); assert.ok(dc.matrix[0][0] > base.matrix[0][0]); for (let i = 0; i < base.matrix.length; i++) near(base.matrix[i].reduce((s, x) => s + x, 0), dc.matrix[i].reduce((s, x) => s + x, 0)); });

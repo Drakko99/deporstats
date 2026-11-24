@@ -1,0 +1,6 @@
+.match-toolbar { display: flex; gap: 14px; margin-bottom: 24px; }
+.search-input { display: flex; gap: 12px; align-items: center; flex: 1; border-radius: 13px; padding: 0 17px; color: var(--muted); }
+.search-input input { width: 100%; background: none; border: none; color: var(--text); padding: 15px 0; outline: none; }
+.search-input:focus-within { border-color: #8bffe26b; box-shadow: 0 0 22px #8bffe20a; }
+.count-pill { padding: 9px 15px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); font-size: .875rem; white-space: nowrap; background: #a3c6d307; }
+@media (max-width: 650px) { .match-toolbar { flex-direction: column; } }

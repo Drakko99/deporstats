@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# Se permite leer la página para que el buscador detecte noindex.

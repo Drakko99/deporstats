@@ -1,0 +1,9 @@
+.dashboard-heading { margin-bottom: 23px; }
+.overview-count { display: flex; align-items: center; gap: 20px; color: var(--muted); font-size: .875rem; white-space: nowrap; }
+.overview-count strong { font-size: 1.25rem; font-weight: 500; color: #e0ffec; margin-right: 5px; }
+.overview-count i { height: 22px; width: 1px; background: var(--border); }
+.radar-filter { display: flex; align-items: center; gap: 10px; font-size: .8125rem; color: var(--muted); }
+.radar-filter select { padding: 8px 33px 8px 12px; min-height: 38px; font-size: .8125rem; background-color: #bdcee808; }
+.radar-note { color: var(--muted); font-size: .8125rem; margin: -8px 0 32px; line-height: 1.8; max-width: 880px; }
+@media (max-width: 760px) { .dashboard-heading { align-items: flex-start; }.overview-count { display: none; }.radar-filter > span { max-width: 85px; line-height: 1.5; }.dashboard-matches .section-heading { align-items: flex-start; }.dashboard-matches .secondary-button { font-size: .8125rem; padding: 10px 12px; max-width: 130px; } }
+@media (max-width: 430px) { .radar-filter { gap: 7px; }.radar-filter > span { display: none; }.radar-filter select { padding-left: 9px; } }

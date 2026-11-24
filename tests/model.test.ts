@@ -1,0 +1,17 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { demoHistory } from '../server/demo';
+import { defaultOptions, fitModel, predict, validateHistory } from '../server/model';
+import { scoring, trainAndEvaluate } from '../server/evaluation';
+const history = demoHistory(), cutoff = '2024-09-01T00:00:00.000Z';
+test('El ajuste ignora resultados que aún no estaban disponibles', () => { const original = fitModel(history, cutoff); const altered = history.map(r => r.availableAt >= cutoff ? { ...r, homeGoals: 20, awayGoals: 20, homeXg: 20, awayXg: 20 } : r); assert.deepEqual(fitModel(altered, cutoff), original); assert.ok(original.lastResultAt < cutoff); });
+test('Los equipos desconocidos no reciben fuerzas inventadas', () => { const m = fitModel(history, cutoff); assert.throws(() => predict(m, 'Equipo inexistente', history[0].away)); assert.throws(() => predict(m, history[0].home, history[0].home)); });
+test('La muestra efectiva nunca supera el número de partidos', () => { const m = fitModel(history, cutoff); assert.ok(m.effectiveSampleSize <= m.sampleSize); assert.ok(m.effectiveSampleSize > 0); });
+test('Entrenamiento determinista y parámetros identificables', () => { const m = fitModel(history, cutoff); assert.deepEqual(fitModel(history, cutoff), m); assert.ok(Math.abs(Object.values(m.parameters.attack).reduce((s, v) => s + v, 0)) < 1e-8); assert.ok(Math.abs(Object.values(m.parameters.defence).reduce((s, v) => s + v, 0)) < 1e-8); });
+test('El modelo aprende ventaja local en un histórico sintético', () => { const m = fitModel(history, '2025-01-01T00:00:00Z'); assert.ok(m.parameters.homeAdvantage > 0); });
+test('No usa xG si no hay cobertura', () => { const rows = history.map(({ homeXg, awayXg, ...r }) => r); assert.throws(() => fitModel(rows, cutoff, { ...defaultOptions, xgWeight: 0.5 }), /Cobertura/); assert.equal(fitModel(rows, cutoff).xgParameters, undefined); });
+test('Rechaza duplicados, marcadores negativos y fechas inválidas', () => { assert.throws(() => validateHistory([...history, history[0]])); assert.throws(() => validateHistory([{ ...history[0], homeGoals: -1 }])); assert.throws(() => validateHistory([{ ...history[0], availableAt: 'bad' }])); });
+test('Log loss y Brier tienen los valores conocidos', () => { const score = scoring([0.5, 0.25, 0.25], 0); assert.ok(Math.abs(score.logLoss - Math.log(2)) < 1e-12); assert.equal(score.brier, 0.375); });
+test('La evaluación informa el corte de cada bloque sin filtración temporal', () => { const a = trainAndEvaluate(history, 'spain:laliga', '2025-01-01T00:00:00Z', 'synthetic'); assert.ok(a.evaluation.folds.every(f => f.trainedThrough < f.asOf)); assert.equal(a.evaluation.folds.reduce((s, f) => s + f.count, 0), a.evaluation.testMatches); assert.equal(a.evaluation.bins.reduce((s, b) => s + b.count, 0), 3 * a.evaluation.testMatches); });
+test('Cambiar los resultados reservados no cambia la selección de hiperparámetros', () => { const a = trainAndEvaluate(history, 'spain:laliga', '2025-01-01T00:00:00Z', 'synthetic'); const changed = history.map(r => r.date >= a.evaluation.testFrom ? { ...r, homeGoals: 0, awayGoals: 4 } : r); const b = trainAndEvaluate(changed, 'spain:laliga', '2025-01-01T00:00:00Z', 'synthetic'); assert.deepEqual(a.evaluation.selected, b.evaluation.selected); assert.deepEqual(a.evaluation.candidates, b.evaluation.candidates); });
+test('No presenta evaluación si faltan datos', () => { assert.throws(() => trainAndEvaluate(history.slice(0, 100), 'spain:laliga', '2025-01-01T00:00:00Z', 'synthetic'), /180/); });

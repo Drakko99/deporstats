@@ -1,0 +1,21 @@
+.opportunities-section { margin: 0 0 30px; }
+.opportunity-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+.opportunity { --glow-rgb: 165,104,255; position: relative; isolation: isolate; padding: 22px 24px; overflow: hidden; background: radial-gradient(ellipse at 100% -25%,#a258ff24,transparent 75%),linear-gradient(130deg,#d0c1ff0d,#171b295c); transition: transform .3s var(--ease), border-color .3s, box-shadow .3s; }
+.opportunity-recommended { --glow-rgb: 52,255,130; background: radial-gradient(ellipse at 100% -25%,#00ff7520,transparent 75%),linear-gradient(130deg,#bcffd40b,#0b242052); }
+a.opportunity:hover { transform: translateY(-3px); border-color: #bba3ff65; box-shadow: inset 0 1px 0 #ffffff25,0 14px 36px #00000038,0 0 30px #a365ff15; }
+a.opportunity-recommended:hover { border-color: #32ff8670; }
+.opportunity > * { position: relative; z-index: 1; }
+.opportunity-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: .8125rem; }
+.edge { display: inline-flex; align-items: center; color: var(--positive); border: 1px solid #32ff8647; border-radius: 8px; padding: 5px 8px; background: #22ff7a0a; white-space: nowrap; font-variant-numeric: tabular-nums; box-shadow: 0 0 18px #12ff790a; }
+.opportunity h3 { margin: 20px 0 8px; font-size: 1.1875rem; font-weight: 550; letter-spacing: -.3px; }
+.opportunity-fixture { margin: 0; color: #c7cfdd; font-size: .875rem; line-height: 1.6; }
+.opportunity-fixture > span { color: #8b9cae; margin: 0 3px; }
+.confidence-line { color: #abffc7; display: flex; gap: 7px; align-items: center; font-size: .8125rem; margin-top: 14px; }
+.opportunity-prices { margin-top: 18px; padding-top: 16px; border-top: 1px solid #cde2e31c; }
+.opportunity-detail { display: inline-block; margin-top: 14px; color: #c9afff; font-size: .8125rem; }
+.opportunity-recommended .opportunity-detail { color: #a0ffc0; }
+.section-subtitle { color: var(--muted); font-size: .8125rem; margin: 8px 0 0; line-height: 1.7; }
+.recommendation-tag { color: var(--positive); border-color: #32ff8647; white-space: nowrap; }
+@media (max-width: 1250px) { .opportunity { padding: 20px; }.opportunity-grid { gap: 14px; }.opportunity-top { flex-wrap: wrap; }.opportunity-fixture { min-height: 44px; } }
+@media (max-width: 760px) { .opportunity-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 5px 0 13px; margin-top: -5px; scrollbar-width: thin; scrollbar-color: #9973e14d transparent; }.opportunity { min-width: 0; flex: 0 0 min(310px,88%); scroll-snap-align: start; }.opportunity-top { flex-wrap: nowrap; }.opportunity-fixture { min-height: 44px; }.opportunities-section { margin-bottom: 28px; }.recommended-section .section-heading { align-items: flex-start; }.recommendation-tag { display: none; } }
+@media (max-width: 430px) { .opportunity { padding: 18px; }.opportunity-top { flex-wrap: wrap; font-size: .75rem; }.opportunities-section h2 { font-size: 1.0625rem; }.opportunities-section .section-heading { gap: 10px; }.opportunity .comparison-price > span { font-size: .75rem; } }

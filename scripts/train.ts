@@ -1,0 +1,11 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { importHistory } from '../server/importer';
+import { trainAndEvaluate } from '../server/evaluation';
+import { competitions } from '../shared/competitions';
+const [file, competition] = process.argv.slice(2);
+if (!file || !competitions.some(c => c.id === competition)) throw new Error('Uso: npm run train -- historial.csv spain:laliga');
+const imported = importHistory(await readFile(file, 'utf8'), competition);
+const model = trainAndEvaluate(imported.matches, competition, new Date().toISOString(), path.basename(file));
+await mkdir('data', { recursive: true }); await writeFile(path.join('data', encodeURIComponent(`models/${encodeURIComponent(competition)}.json`)), JSON.stringify(model));
+console.log(JSON.stringify({ testMatches: model.evaluation.testMatches, logLoss: model.evaluation.logLoss, baselineLogLoss: model.evaluation.baselineLogLoss, brier: model.evaluation.brier, warnings: imported.warnings }, null, 2));

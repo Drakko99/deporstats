@@ -1,0 +1,21 @@
+.positive { color: var(--positive); }
+.negative { color: var(--negative); }
+.comparison-legend { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0 0 19px; color: var(--muted); font-size: .8125rem; line-height: 1.6; }
+.comparison-legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.legend-swatch { width: 16px; height: 3px; border-radius: 2px; background: currentColor; box-shadow: 0 0 10px currentColor; }
+.odds-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; font-variant-numeric: tabular-nums; }
+.comparison-price { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.comparison-price > span { color: var(--muted); font-size: .8125rem; white-space: nowrap; }
+.comparison-price strong { color: #e1d7ff; font-size: 1.8rem; font-weight: 550; letter-spacing: -.5px; }
+.offered-price strong { color: var(--text); }
+.positive .offered-price strong { color: var(--positive); text-shadow: 0 0 20px #25ff7e59; }
+.negative .offered-price strong { color: var(--negative); text-shadow: 0 0 20px #ff314b59; }
+.comparison-difference { grid-column: 1/-1; color: var(--muted); font-size: .8125rem; }
+.positive > .comparison-difference { color: var(--positive); }
+.negative > .comparison-difference { color: var(--negative); }
+.comparison-compact { grid-template-columns: 1fr; gap: 6px; }
+.comparison-compact .comparison-price { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 6px; }
+.comparison-compact .comparison-price > span { font-size: .75rem; }
+.comparison-compact .comparison-price strong { font-size: 1rem; letter-spacing: -.2px; }
+.comparison-compact .comparison-difference { font-size: .75rem; text-align: right; }
+@media (max-width: 380px) { .comparison-compact .comparison-price > span { font-size: .75rem; }.comparison-compact .comparison-price strong { font-size: .9375rem; } }
